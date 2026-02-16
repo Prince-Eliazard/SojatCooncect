@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import 'feedPage.dart'; // Importation corrigée selon ton nom de fichier
+import 'package:flutter/foundation.dart' show kIsWeb; // Nécessaire pour les checks web
+import 'dart:io';
+
+import 'auth_service.dart';
+import 'feed_page.dart';  // Pour la navigation
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -11,47 +14,60 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  bool isLoginMode = true;
-  final _formKey = GlobalKey<FormState>();
-
   // Couleurs du thème
   final Color whiteBg = const Color(0xFFF8F8FF);
   final Color indigoDark = const Color(0xFF1A237E);
-
+  
+  // Listes
   final List<String> _roles = ['Producteur', 'Acheteur', 'Acheteur et Producteur', 'Coopérative'];
   final List<String> _communes = ['Kandi', 'Banikoara', 'Segbana', 'Malanville'];
 
-  String _selectedRole = 'Producteur';
-  String _selectedCommune = 'Kandi';
-  File? _imageFile;
+  final AuthService _authService = AuthService();
   final ImagePicker _picker = ImagePicker();
 
+  // -- UI STATE --
+  bool isLoginMode = true;
+  bool _isLoading = false;
+
+  // -- FORM CONTROLLERS --
+  final _formKey = GlobalKey<FormState>();
+
+  // Champs communs
   final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  
+  // Champs Inscription
   final TextEditingController _nomController = TextEditingController();
   final TextEditingController _prenomController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  
+  String _selectedRole = 'Producteur';
+  String _selectedCommune = 'Kandi';
+  
+  XFile? _imageFile; // Utilisation de XFile pour compatibilité Web
 
   @override
   void dispose() {
     _phoneController.dispose();
+    _passwordController.dispose();
     _nomController.dispose();
     _prenomController.dispose();
-    _passwordController.dispose();
     super.dispose();
   }
 
   Future<void> _pickImage(ImageSource source) async {
     final pickedFile = await _picker.pickImage(source: source);
     if (pickedFile != null) {
-      setState(() => _imageFile = File(pickedFile.path));
+      setState(() => _imageFile = pickedFile);
     }
   }
 
-  // LOGIQUE DE NAVIGATION VERS LE VRAI FIL D'ACTUALITÉ
+  // LOGIQUE DE NAVIGATION
   void _navigateToFeed() {
+    // pushAndRemoveUntil vide la pile de navigation.
+    // L'utilisateur ne pourra pas faire "retour" pour revenir au login.
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (context) => const FeedPage()),
-      (Route<dynamic> route) => false,
+          (Route<dynamic> route) => false,
     );
   }
 
@@ -96,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ],
 
-                _buildField("Téléphone", Icons.phone_android, _phoneController, type: TextInputType.phone),
+                  _buildField("Téléphone", Icons.phone_android, _phoneController, type: TextInputType.phone),
                 _buildField("Mot de passe", Icons.lock_outline, _passwordController, obscure: true),
 
                 if (!isLoginMode) ...[
@@ -109,6 +125,7 @@ class _LoginPageState extends State<LoginPage> {
 
                 const SizedBox(height: 40),
 
+                // BOUTON DE CONNEXION / INSCRIPTION
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: indigoDark,
@@ -117,12 +134,42 @@ class _LoginPageState extends State<LoginPage> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                     elevation: 4,
                   ),
-                  onPressed: () {
+                    onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      _navigateToFeed();
+                      setState(() => _isLoading = true);
+                      try {
+                        if (isLoginMode) {
+                          // --- CONNEXION ---
+                          await _authService.signIn(
+                            phone: _phoneController.text.trim(),
+                            password: _passwordController.text.trim(),
+                          );
+                          _navigateToFeed();
+                        } else {
+                          // --- INSCRIPTION ---
+                          bool isCooperative = _selectedRole == 'Coopérative';
+                          
+                          await _authService.signUp(
+                            phone: _phoneController.text.trim(),
+                            password: _passwordController.text.trim(),
+                            role: _selectedRole,
+                            name: _nomController.text.trim(),
+                            prenom: isCooperative ? null : _prenomController.text.trim(),
+                            commune: _selectedCommune,
+                            imageFile: _imageFile, // On passe XFile directement
+                          );
+                          _navigateToFeed();
+                        }
+                      } catch (e) {
+                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Opération échouée : $e"), backgroundColor: Colors.red));
+                      } finally {
+                        if (mounted) setState(() => _isLoading = false);
+                      }
                     }
                   },
-                  child: Text(
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Text(
                       isLoginMode ? "SE CONNECTER" : "S'INSCRIRE",
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)
                   ),
@@ -147,7 +194,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // --- WIDGETS DE CONSTRUCTION ---
+  // --- WIDGETS DE CONSTRUCTION (DESIGN BLANC/INDIGO) ---
 
   Widget _buildField(String label, IconData icon, TextEditingController ctrl, {bool obscure = false, TextInputType type = TextInputType.text}) {
     return Padding(
@@ -219,7 +266,12 @@ class _LoginPageState extends State<LoginPage> {
         ),
         child: _imageFile == null
             ? Icon(Icons.add_a_photo_outlined, color: indigoDark, size: 35)
-            : ClipRRect(borderRadius: BorderRadius.circular(15), child: Image.file(_imageFile!, fit: BoxFit.cover)),
+            : ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: kIsWeb
+                    ? Image.network(_imageFile!.path, fit: BoxFit.cover)
+                    : Image.file(File(_imageFile!.path), fit: BoxFit.cover),
+              ),
       ),
     );
   }
@@ -246,3 +298,4 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
+

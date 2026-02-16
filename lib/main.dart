@@ -1,7 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'acceuil.dart';
 
-void main() => runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialisation de Firebase
+  // PS: Si cette commande plante, c'est que le fichier firebase_options.dart n'est pas encore créé
+  // Il faudra exécuter `flutterfire configure` dans le terminal.
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch(e) {
+    print("WARNING: Firebase non configuré. Veuillez exécuter 'flutterfire configure'. Erreur: $e");
+  }
+
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -13,16 +30,12 @@ class MyApp extends StatelessWidget {
       title: 'SojatConnect',
       theme: ThemeData(
         useMaterial3: true,
-        // On définit un ColorScheme basé sur le blanc
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFFF8F8FF), // Votre blanc "Ghost White"
-          primary: const Color(0xFFF8F8FF),   // Couleur principale
-          surface: Colors.white,              // Couleur des cartes et fonds
+          seedColor: const Color(0xFFF8F8FF),
+          primary: const Color(0xFFF8F8FF),
+          surface: Colors.white,
         ),
-        // Force le fond de l'application en blanc pur ou Ghost White
         scaffoldBackgroundColor: const Color(0xFFF8F8FF),
-
-        // Optionnel : s'assurer que l'AppBar soit aussi blanche
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFFF8F8FF),
           elevation: 0,

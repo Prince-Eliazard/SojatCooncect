@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'login_page.dart';
+<<<<<<< HEAD
 import 'feedPage.dart'; // Corrigé ici : correspond exactement à ton fichier
+=======
+// N'oublie pas d'importer ton fichier feed_page.dart si tu l'as séparé
+import 'feed_page.dart';
+>>>>>>> 7bf8281 (Add likes, comments, shares, search, and logout functionality with fixes)
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -156,4 +161,8 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 }
+<<<<<<< HEAD
 // LA CLASSE VIDE A ÉTÉ SUPPRIMÉE ICI POUR ÉVITER LES CONFLITS
+=======
+
+>>>>>>> 7bf8281 (Add likes, comments, shares, search, and logout functionality with fixes)
