@@ -8,190 +8,124 @@ class FeedPage extends StatefulWidget {
 }
 
 class _FeedPageState extends State<FeedPage> {
-  // --- COULEURS STYLE FACEBOOK ---
-  final Color fbBlue = const Color(0xFF1877F2); // Le bleu officiel de Facebook
-  final Color fbGrey = const Color(0xFFF0F2F5); // Le gris de fond
-  final Color fbWhite = Colors.white;
+  int _selectedIndex = 0;
+  final Color indigoDark = const Color(0xFF1A237E);
+  final Color accentBlue = const Color(0xFF2196F3);
+  final Color whiteBg = const Color(0xFFF8F8FF);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: fbGrey,
+      backgroundColor: whiteBg,
       appBar: AppBar(
-        backgroundColor: fbWhite,
         elevation: 0.5,
+        backgroundColor: Colors.white,
+        centerTitle: false,
         title: Text(
-          "SodjaConnect",
+          "SojatConnect",
           style: TextStyle(
-            color: fbBlue, 
-            fontWeight: FontWeight.bold, 
-            fontSize: 28, 
-            letterSpacing: -1.2
+            color: accentBlue,
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
           ),
         ),
-        actions: [
-          _buildCircleButton(Icons.add_circle),
-          _buildCircleButton(Icons.search),
-          _buildCircleButton(Icons.messenger),
-        ],
+        // --- MODIFICATION ICI : On supprime le contenu de actions ---
+        actions: const [], 
       ),
-      body: ListView(
-        children: [
-          _buildCreatePostSection(),
-          const SizedBox(height: 8),
-          _buildStoriesSection(),
-          const SizedBox(height: 8),
-          // Liste de publications
-          ...List.generate(5, (index) => _buildPostCard(index)),
-        ],
-      ),
-    );
-  }
-
-  // --- SECTION QUOI DE NEUF ---
-  Widget _buildCreatePostSection() {
-    return Container(
-      color: fbWhite,
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              const CircleAvatar(
-                backgroundImage: NetworkImage("https://i.pravatar.cc/150?img=3"),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: fbGrey,
-                    borderRadius: BorderRadius.circular(20),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Section Profil et Demande d'Achat
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  const CircleAvatar(
+                    radius: 25,
+                    backgroundColor: Colors.grey,
+                    child: Icon(Icons.person, color: Colors.white),
                   ),
-                  child: const Text("À quoi pensez-vous ?", style: TextStyle(fontSize: 16)),
-                ),
-              ),
-            ],
-          ),
-          const Divider(height: 25, thickness: 0.5),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildAction(Icons.videocam, "En direct", Colors.red),
-              _buildAction(Icons.photo_library, "Photo", Colors.green),
-              _buildAction(Icons.video_call, "Salon", Colors.purple),
-            ],
-          )
-        ],
-      ),
-    );
-  }
-
-  // --- SECTION STORIES ---
-  Widget _buildStoriesSection() {
-    return Container(
-      height: 200,
-      color: fbWhite,
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        itemCount: 5,
-        itemBuilder: (context, index) {
-          return Container(
-            width: 110,
-            margin: const EdgeInsets.symmetric(horizontal: 5),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              image: DecorationImage(
-                image: NetworkImage("https://picsum.photos/200/400?random=$index"),
-                fit: BoxFit.cover,
+                  const SizedBox(width: 15),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Text(
+                        "Demande d'Achat",
+                        style: TextStyle(color: Colors.black54, fontSize: 16),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          );
-        },
+            const Divider(thickness: 1, height: 1),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
+              child: Text(
+                "Fil d'actualité",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: indigoDark,
+                ),
+              ),
+            ),
+            _buildPostCard(),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: (index) => setState(() => _selectedIndex = index),
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: accentBlue,
+        unselectedItemColor: Colors.grey,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: "Acceuil"),
+          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), label: "Messages"),
+          BottomNavigationBarItem(icon: Icon(Icons.notifications_none), label: "Notifs"),
+          BottomNavigationBarItem(icon: Icon(Icons.settings_outlined), label: "Paramètres"),
+        ],
       ),
     );
   }
 
-  // --- WIDGET POST (CARTE) ---
-  Widget _buildPostCard(int index) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      color: fbWhite,
+  Widget _buildPostCard() {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+        side: BorderSide(color: Colors.grey.shade200),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ListTile(
-            leading: const CircleAvatar(child: Icon(Icons.person)),
-            title: const Text("Utilisateur Sodja", style: TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Row(
-              children: [
-                const Text("2 h • "),
-                Icon(Icons.public, size: 14, color: Colors.grey[600]),
-              ],
-            ),
-            trailing: const Icon(Icons.more_horiz),
+          const ListTile(
+            leading: CircleAvatar(backgroundColor: Colors.indigo, radius: 18),
+            title: Text("Omar Le Riche", style: TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text("21 min"),
+            trailing: Icon(Icons.more_horiz),
           ),
           const Padding(
-           padding: const EdgeInsets.fromLTRB(15, 15, 15, 10),
-            child: Text("Ceci est une publication test sur le nouveau fil d'actualité."),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Text("Contenu du fil d'actualité..."),
           ),
-          Image.network("https://picsum.photos/600/400?random=${index + 10}", fit: BoxFit.cover),
-          _buildPostStats(),
-          const Divider(height: 1, indent: 15, endIndent: 15),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildInteraction(Icons.thumb_up_off_alt, "J'aime"),
-              _buildInteraction(Icons.chat_bubble_outline, "Commenter"),
-              _buildInteraction(Icons.share_outlined, "Partager"),
-            ],
+          Container(
+            height: 250,
+            width: double.infinity,
+            color: Colors.grey.shade100,
+            child: const Icon(Icons.image, size: 50, color: Colors.grey),
           ),
         ],
       ),
     );
   }
-
-  // --- HELPER WIDGETS ---
-  Widget _buildCircleButton(IconData icon) => Container(
-    margin: const EdgeInsets.all(4),
-    decoration: BoxDecoration(color: fbGrey, shape: BoxShape.circle),
-    child: IconButton(icon: Icon(icon, color: Colors.black, size: 22), onPressed: () {}),
-  );
-
-  Widget _buildAction(IconData icon, String label, Color color) => Row(
-    children: [
-      Icon(icon, color: color, size: 22),
-      const SizedBox(width: 5),
-      Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
-    ],
-  );
-
-  Widget _buildPostStats() => Padding(
-    padding: const EdgeInsets.all(12),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(color: fbBlue, shape: BoxShape.circle),
-              child: const Icon(Icons.thumb_up, color: Colors.white, size: 10),
-            ),
-            const SizedBox(width: 5),
-            const Text("124"),
-          ],
-        ),
-        const Text("12 commentaires • 4 partages"),
-      ],
-    ),
-  );
-
-  Widget _buildInteraction(IconData icon, String label) => TextButton.icon(
-    onPressed: () {},
-    icon: Icon(icon, color: Colors.grey[600]),
-    label: Text(label, style: TextStyle(color: Colors.grey[600])),
-  );
 }

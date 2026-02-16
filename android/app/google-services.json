@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "870965217564",
+    "project_id": "sojatconnect",
+    "storage_bucket": "sojatconnect.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:870965217564:android:6ca316a14dd9b5251912d9",
+        "android_client_info": {
+          "package_name": "com.example.application2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpdWUavr3jZYkxgrhZm0f27oMakZYe-fs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

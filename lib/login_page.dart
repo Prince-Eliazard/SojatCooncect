@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-// N'oublie pas d'importer ton fichier feed_page.dart ici
-// import 'feed_page.dart';
+import 'feedPage.dart'; // Importation corrigée selon ton nom de fichier
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -48,13 +47,11 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  // LOGIQUE DE NAVIGATION
+  // LOGIQUE DE NAVIGATION VERS LE VRAI FIL D'ACTUALITÉ
   void _navigateToFeed() {
-    // pushAndRemoveUntil vide la pile de navigation.
-    // L'utilisateur ne pourra pas faire "retour" pour revenir au login.
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (context) => const FeedPage()),
-          (Route<dynamic> route) => false,
+      (Route<dynamic> route) => false,
     );
   }
 
@@ -112,7 +109,6 @@ class _LoginPageState extends State<LoginPage> {
 
                 const SizedBox(height: 40),
 
-                // BOUTON DE CONNEXION / INSCRIPTION
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: indigoDark,
@@ -123,7 +119,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      // Simulation de succès et navigation
                       _navigateToFeed();
                     }
                   },
@@ -152,7 +147,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // --- WIDGETS DE CONSTRUCTION (DESIGN BLANC/INDIGO) ---
+  // --- WIDGETS DE CONSTRUCTION ---
 
   Widget _buildField(String label, IconData icon, TextEditingController ctrl, {bool obscure = false, TextInputType type = TextInputType.text}) {
     return Padding(
@@ -248,23 +243,6 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ]),
       ),
-    );
-  }
-}
-
-// --- CLASSE TEMPORAIRE POUR LE FIL D'ACTUALITÉ ---
-// À placer dans un fichier séparé normalement
-class FeedPage extends StatelessWidget {
-  const FeedPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Fil d'actualité"),
-        backgroundColor: const Color(0xFF1A237E),
-      ),
-      body: const Center(child: Text("Bienvenue sur SodjaConnect !")),
     );
   }
 }

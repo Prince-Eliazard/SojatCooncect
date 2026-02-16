@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'login_page.dart';
-// N'oublie pas d'importer ton fichier feed_page.dart si tu l'as séparé
-// import 'feed_page.dart';
+import 'feedPage.dart'; // Corrigé ici : correspond exactement à ton fichier
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -16,15 +15,14 @@ class _RegisterPageState extends State<RegisterPage> {
   String _selectedCommune = 'Kandi';
   final List<String> _communes = ['Kandi', 'Banikoara', 'Segbana'];
 
-  // Couleurs cohérentes
   final Color whiteBg = const Color(0xFFF8F8FF);
   final Color indigoDark = const Color(0xFF1A237E);
 
-  // LOGIQUE DE NAVIGATION VERS LE FIL
+  // NAVIGATION VERS LE FIL
   void _navigateToFeed() {
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => const FeedPage()),
-          (Route<dynamic> route) => false,
+      MaterialPageRoute(builder: (context) => const FeedPage()), // Vérifie que la classe dans feesPage s'appelle FeedPage
+      (Route<dynamic> route) => false,
     );
   }
 
@@ -33,9 +31,9 @@ class _RegisterPageState extends State<RegisterPage> {
     return Scaffold(
       backgroundColor: whiteBg,
       appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          iconTheme: IconThemeData(color: indigoDark)
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: IconThemeData(color: indigoDark),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -46,17 +44,17 @@ class _RegisterPageState extends State<RegisterPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                    "Inscription",
-                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: indigoDark)
+                  "Inscription",
+                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: indigoDark)
                 ),
                 const SizedBox(height: 30),
 
                 _buildDropdown(
-                    "Vous êtes ?",
-                    Icons.person_pin_rounded,
-                    ['Producteur', 'Acheteur', 'Coopérative'],
-                    _selectedUserType,
-                        (v) => setState(() => _selectedUserType = v)
+                  "Vous êtes ?",
+                  Icons.person_pin_rounded,
+                  ['Producteur', 'Acheteur', 'Coopérative'],
+                  _selectedUserType,
+                  (v) => setState(() => _selectedUserType = v)
                 ),
 
                 if (_selectedUserType != null) ...[
@@ -77,7 +75,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        // LOGIQUE D'INSCRIPTION RÉUSSIE
                         _navigateToFeed();
                       }
                     },
@@ -107,7 +104,6 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   // --- WIDGETS DE CONSTRUCTION ---
-
   Widget _buildField(String label, IconData icon, {bool obscure = false, TextInputType type = TextInputType.text}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
@@ -115,7 +111,7 @@ class _RegisterPageState extends State<RegisterPage> {
         obscureText: obscure,
         keyboardType: type,
         style: TextStyle(color: indigoDark),
-        validator: (v) => v!.isEmpty ? "Champ obligatoire" : null, // Validation ajoutée
+        validator: (v) => v!.isEmpty ? "Champ obligatoire" : null,
         decoration: InputDecoration(
           labelText: label,
           labelStyle: TextStyle(color: indigoDark.withOpacity(0.5)),
@@ -129,10 +125,6 @@ class _RegisterPageState extends State<RegisterPage> {
           focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
               borderSide: BorderSide(color: indigoDark, width: 2)
-          ),
-          errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
-              borderSide: const BorderSide(color: Colors.redAccent)
           ),
         ),
       ),
@@ -159,25 +151,9 @@ class _RegisterPageState extends State<RegisterPage> {
               borderRadius: BorderRadius.circular(15),
               borderSide: BorderSide(color: indigoDark.withOpacity(0.1))
           ),
-          focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15),
-              borderSide: BorderSide(color: indigoDark, width: 2)
-          ),
         ),
       ),
     );
   }
 }
-
-// Classe de secours pour que le code tourne
-class FeedPage extends StatelessWidget {
-  const FeedPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Fil d'actualité"), backgroundColor: const Color(0xFF1A237E)),
-      body: const Center(child: Text("Bienvenue !")),
-    );
-  }
-}
+// LA CLASSE VIDE A ÉTÉ SUPPRIMÉE ICI POUR ÉVITER LES CONFLITS
